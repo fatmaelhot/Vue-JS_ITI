@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Shopping</title>
+    <script src="vueversion3.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    
+    <style>
+        .more{
+            color: green;
+        }
+        .less{
+            color: orange;
+        }
+        .none{
+            color: red;
+        }
+        .more,.less,.none{
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="mainapp">
+        <!--banner-->
+        <div class="d-flex justify-items-baseline justify-content-between bg-dark text-light p-2 m-2" >
+            <a href="#" style="color: yellow;text-decoration: none;" @click.prevent="isWishlistvisible=false" class="fw-bold fs-4 m-2">Books</a>
+            <div class="d-flex align-items-baseline mx-2 m-2">
+                <p>[{{wishlist.items.length}}]books</p>
+                <button class="btn btn-danger ms-2" @click="isWishlistvisible=true">My Favorit</button>
+            </div>
+        </div>
+        <!--end of banner-->
+        <!--books-->
+        <div class="row bg-dark p-2 m-2" v-if="isWishlistvisible==false">
+            <div class="col-md-4" v-for="book in books" :key="book.id">
+                <div class="card  mb-3 ">
+                    <img :src="book.imageLink" :title="book.title" class="card-img-top" style="width: 100%;height: 400px;">
+                    <div class="card-body">
+                        <h5 class="card-title text-center">{{ book.title }}</h5>
+                        <p>Author : {{book.author}}</p>
+                        <p>publish in : {{book.year}}</p>
+                        <p>language : {{book.language}}</p>
+                        <div class="card-footer">
+                            <div class="d-flex justify-items-baseline justify-content-between">
+                                <p :class="[book.pages>=50?'more':'',book.pages<50?'less':'',book.pages==0?'none':'']">num of pages : {{book.pages}}</p>
+                                <button :disabled="isInWishlist(book)" class="btn btn-warning" @click="addToWishlist(book)">Add to Wishlist</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--end of books-->
+
+        <!--wishlist-->
+        <div class="d-flex justify-items-baseline justify-content-between p-2 m-2" v-else="isWishlistvisible">
+            <h4 class="text-center w-100 text-danger" v-if="wishlist.items.length==0">Sorry, Add your favourite books</h4>
+            <table class=" table table-bordered table-striped text-center" v-else>
+                <thead>
+                    <tr>
+                        <th>title</th>
+                        <th>author</th>
+                        <th>year</th>
+                        <th>country</th>
+                        <th>pages</th>
+                        <th>language</th>
+                        <!--<th>quantity</th>-->
+                        <th>action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in wishlist.items">
+                        <td>{{item.book.title}}</td>
+                        <td>{{item.book.author}}</td>
+                        <td>{{item.book.year}}</td>
+                        <td>{{item.book.country}}</td>
+                        <td>{{item.book.pages}}</td>
+                        <td>{{item.book.language}}</td>
+                        <!--<td>{{item.quantity}}</td>-->
+                        <td><button @click="removeBook(item)" class="btn btn-danger">x</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <!--end of wishlist-->
+    </div>
+
+    <script src="books.js"></script>
+    <script>
+        const app = Vue.createApp({
+            data: () => ({
+                books: books,
+                isWishlistvisible: false,
+                wishlist: {
+                    items: []
+                }
+            }),
+            methods: {
+                addToWishlist(book) {
+                    const existingItem = this.wishlist.items.find(item => item.book.title === book.title);
+                    if (existingItem) {
+                        alert("Book already in the wishlist");
+                    } else {
+                        this.wishlist.items.push({ book: book, quantity: 1 });
+                    }
+                },
+                removeBook(item) {
+                    item.quantity--;
+                    if (item.quantity <= 0) {
+                        const index = this.wishlist.items.indexOf(item);
+                        if (index !== -1) {
+                            this.wishlist.items.splice(index, 1);
+                        }
+                    }
+                },
+                isInWishlist(book) {
+                    return this.wishlist.items.some(item => item.book.title === book.title);
+                }
+            }
+        });
+
+        app.mount("#mainapp");
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+</body>
+</html>
+
